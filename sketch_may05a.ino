@@ -1,11 +1,11 @@
-//Updated may08 av Gustav
+//Updated may08 av Gustav o Kalle
 #define dirPin 2
 #define stepPin 3
 #define stepsPerRevolution 200
 
 int moisture1 = 0;  int moisture2 = 0;  int moisture3 = 0;
 int sensorValue1 = 0; int sensorValue2 = 0; int sensorValue3 = 0;
-int dry = 0; int waterPin = 7; int Tid = 0;
+int dry = 0; int waterPin = 4; int sensePin = 5; int irPin = 6;
 
 void setup() {
   Serial.begin(9600);
@@ -31,16 +31,6 @@ void loop() {
     motorControl(1);
   }
 
-  Tid = checkTime();
-  if (Tid < 8){
-    changeColor(3); //Dawn
-  }
-  else if (Tid > 18){
-    changeColor(2); //Evening
-  }
-  else{
-    changeColor(1); //Day
-  }
  }
 
 // FUNCTIONS!!!
@@ -88,16 +78,16 @@ void motorControl(int direction){
   digitalWrite(dirPin,LOW); 
   }
 
-  //how many steps for each pot???
-  //66steps??
-  for (int i = 0; i < 66; i++){
+  //Continue moving until irSense reads white paper.
+  int readValue = irSensor();
+  while (readValue == 0){
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(2000);
     digitalWrite(stepPin, LOW);
     delayMicroseconds(2000);
+    readValue = irSensor();
   }
-  }
-
+ }
 //waterpump function
 void waterPlant(){
   digitalWrite(waterPin, HIGH);
@@ -105,33 +95,12 @@ void waterPlant(){
   digitalWrite(waterPin, LOW);
   delay(3000); //let the excess water run
 }
+//IR function
 
-//light function
-int checkTime(){
-  int Time;
-  return Time; //Need a function to find real Time in 24hr clock. 
-}
-
-void changeColor(int rgb){
-  if (rgb == 1){
-    setDay(); //Changes the color of lamps 
+int irSensor(){
+  digitalWrite(irPin,HIGH);
+  int senseValue = digitalRead(sensePin);
+  if (senseValue != 0){
+    return 1;
   }
-  else if (rgb == 2){
-    setEvening();
-  }
-  else if (rgb == 3){
-    setDawn();
-  }
-}
-
-
-//Set lamp functions
-
-void setDay(){
-}
-
-void setEvening(){
-}
-
-void setDawn(){
 }
